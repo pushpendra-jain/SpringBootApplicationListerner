@@ -25,7 +25,7 @@ We needed some hook which
 
 2. Decrypt some encrypted properties specially passwords using our custom decryption mechanism
 
-3. Set required properties as System properties after reading some properties step 1, so that beans who needs these propertiesto initialize itselves.
+3. Set required properties as System properties after reading some properties from step 1, so that beans who needs these propertiesto initialize itselves.
 
 We looked for solution on the web and couldn't find any readymade solutions for these points. In this I will show how we handled these problems.
 
