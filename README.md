@@ -13,7 +13,7 @@ If this were a pre spring boot application or a plain web application we would h
 The problem with our application was that it was pure spring boot application i.e it was using as much functionality of spring boot as possible. Being a spring boot applicatiion all the initialization propeties were kept in "application.properties" which spring boot appliction reads (by default, no need to hard-code the file name  anywhere in the application) and loads all the propeties and inject as PropertySource in our application. 
 
 
-We did not wanted to have any listener class written where we have to property file location and it's name explicitly and we wanted to keep using the same application.properties file which spring boot was using (from wherever it loads that, be it classpath or custom file lcation). 
+We did not wanted to have any listener class written where we have to hard-code property file location or its name explicitly and we wanted to keep using the same "application.properties" file which spring boot was using (from wherever it loads that, be it classpath or custom file lcation). 
 We wanted a solution to have spring boot lifecycle handle it rather then writing some solution which would be outside of spring initialization lifecycle for consistency purpose.
 
 
@@ -27,20 +27,19 @@ We needed some hook which
 
 3. Set required properties as System properties after reading some properties step 1, so that beans who needs these propertiesto initialize itselves.
 
-We look for solution on the web and couldn't find any readymade solutions for these points. In this I will show how we handled these problems.
+We looked for solution on the web and couldn't find any readymade solutions for these points. In this I will show how we handled these problems.
 
 
+Solution : Though spring does not provide any built in solution for handling above mention problem but we found that it does provide eventListener classes which could provide us application hooks at different level of spring-boot application life cycle. For our problem statment,  we decided to implement ##org.springframework.context.ApplicationListener which could listen for ##ApplicationEnvironmentPreparedEvent. From [spring-bbot documentation](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/context/event/ApplicationEnvironmentPreparedEvent.html)- **Event published when a SpringApplication is starting up and the Environment is first available.** This is exactly what we needed i.e. -
+1. When this event gets triggered we can be sure that spring has already read all the properties from spring config file (application.prooperties or whatever name we decided to have) as this being part of spring-boot lifecycle
+2. We can be also be sure that none of the beans are initlized at the point when control comes to this listener, so we can do any pre-processing we need.
 
-Solution : Though spring does not provide any built in solution for handling above mention problem but we found that it does provide eventListener classes which could provide us application hooks at different level of spring-boot application life cycle. For our problem statment,  we decided to implement ##org.springframework.context.ApplicationListener which could listen for ##ApplicationEnvironmentPreparedEvent. From spring-bbot documentation ##https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/context/event/ApplicationEnvironmentPreparedEvent.html, Event published when a SpringApplication is starting up and the Environment is first available. This is exactly what we needed.
-1. Before this event gets triggered we can be sure that spring has already read all the properties from spring config file (application.prooperties or whatever name we decided to have) this being part of spring-boot lifecycle
-2. We can be also sure that none of the beans are initlized when control comes to this listener, so we can dio any preprocerssing we need.
+To implement this solution we just need two steps -
+**1. Implement this ApplicationListener which would listen for ApplicationEnvironmentPreparedEvent, where we can read the properties from spring environment (which spring read from config file) by overriding ##onApplicationEvent method.
+2. Register our listener with spring-boot**
 
-So to implement this solution we just need two steps -
-1. Implement this ApplicationListener which would listen for ApplicationEnvironmentPreparedEvent, where we can read the properties from spring environment (which spring read from config file) by overriding ##onApplicationEvent method.
-2. Register our listener with spring-boot
-
-Here is sample demo -
-1. Implement the ApplicationListener
+Here is sample demo for incorporating this solution in any spring-boot application -
+**1. Implement the ApplicationListener interface**
 ```java
 
 public class SystemPropertiesLoader implements ApplicationListener<ApplicationEnvironemntPreparedEvent>
@@ -57,9 +56,10 @@ public class SystemPropertiesLoader implements ApplicationListener<ApplicationEn
   
   }
 ```
-2. Register the listener
+**2. Register the listener with Spring-boot**
 
-  2.1 If we are using spring-boot's embadded server
+   **2.1 If we are using spring-boot's embadded server**
+   
   ```java
   public staic void main (String[] args){
     SpringApplication springApp = new SpringApplication(ProjectConfigurationClass configClass);
@@ -70,7 +70,8 @@ public class SystemPropertiesLoader implements ApplicationListener<ApplicationEn
     springApp.run();
   }
   ``` 
-  2.2 If we are planning of creating a war file and planning to deploy on external server, then we will have to register this listener via overriding the "configure" method of Abstract class SpringBootServletInitializer". To know more about this class and why we need this read this https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/web/servlet/support/SpringBootServletInitializer.html and this https://www.baeldung.com/spring-boot-servlet-initializer
+  
+  **2.2 If we are planning of creating traditional  web application to deploy on external server, then we will have to register this listener by overriding the "configure" method of Abstract class SpringBootServletInitializer". To know more about this class and why we need this read [this from spring documentation](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/web/servlet/support/SpringBootServletInitializer.html) and [this from baeldung](https://www.baeldung.com/spring-boot-servlet-initializer)**
   
   ```java
   @Override
