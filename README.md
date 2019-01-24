@@ -44,6 +44,7 @@ public class SystemPropertiesLoader implements ApplicationListener<ApplicationEn
   }
 ```
 2. Register the listener
+
   2.1 If we are using spring-boot's embadded server
   ```java
   public staic void main (String[] args){
@@ -58,9 +59,16 @@ public class SystemPropertiesLoader implements ApplicationListener<ApplicationEn
   2.2 If we are planning of creating a war file and planning to deploy on external server, then we will have to register this listener via overriding the "configure" method of Abstract class SpringBootServletInitializer". To know more about this class and why we need this read this https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/web/servlet/support/SpringBootServletInitializer.html and this https://www.baeldung.com/spring-boot-servlet-initializer
   
   ```java
+  @Override
   protected SpringApplicationBuilder configure(SpringApplicationBuilder builder){
     return builder.listeners(new SystemPropertiesLoader());
   }
   
   ```
+  
+ And voila, you have the hook and all the properties available as SystemProperties and you can be sure that these properties will be set as System properties before any bean gets initialized in spring-boot lifecycle. We do not need to worry of any dependecy of beans or order of the beans to make sure that bean which is setting the system properties gets loaded before the one which is consuming it.
+ 
+ This is specially useful when we have some beans which comes as API/jars where order of those beans in not in our control and we can not make them dependent on others or we can not set the order of those.
+ 
+Setting the SystemProperties was one of the use case specific to our requirement but the point is this hook can be used for any pre-processing logic before any of the beans start getting initialized in spring-boot lifecycle.
 
