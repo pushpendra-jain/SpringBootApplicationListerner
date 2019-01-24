@@ -92,7 +92,7 @@ public class SystemPropertiesLoader implements ApplicationListener<ApplicationEn
   
   ```
   
-And voila, no hard coding of any file name or its location, you have the hook and all the properties available as SystemProperties and you can be sure that these properties will be set as System properties before any bean gets initialized in spring-boot lifecycle. We do not need to worry of any dependecy of beans or order of the beans to make sure that bean which is setting the system properties gets loaded before the one which is consuming it.
+And voila, no hard coding of any file name or its location, you have the hook and all the properties available as SystemProperties and you can be sure that these properties will be set as System properties before any bean gets initialized in spring-boot lifecycle. We do not need to worry of any dependency of beans or order of the beans to make sure that bean which is setting the system properties gets loaded before the one which is consuming it.
  
 This is specially useful when we have some beans which comes as API/jars where order of those beans in not in our control and we can not make them dependent on others or we can not set the order of those.
  
