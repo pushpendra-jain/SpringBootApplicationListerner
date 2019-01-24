@@ -30,7 +30,7 @@ We needed some hook which
 We looked for solution on the web and couldn't find any readymade solutions for these points. In this I will show how we handled these problems.
 
 
-Solution : Though spring does not provide any built in solution for handling above mention problem but we found that it does provide eventListener classes which could provide us application hooks at different level of spring-boot application life cycle. For our problem statment,  we decided to implement ##org.springframework.context.ApplicationListener which could listen for ##ApplicationEnvironmentPreparedEvent. From [spring-bbot documentation](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/context/event/ApplicationEnvironmentPreparedEvent.html)- **Event published when a SpringApplication is starting up and the Environment is first available.** This is exactly what we needed i.e. -
+Solution : Though spring does not provide any built in solution for handling above mention problem but we found that it does provide eventListener classes which could provide us application hooks at different level of spring-boot application life cycle. For our problem statment,  we decided to implement ##org.springframework.context.ApplicationListener which could listen for **ApplicationEnvironmentPreparedEvent**. From [spring-bbot documentation](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/context/event/ApplicationEnvironmentPreparedEvent.html)- **Event published when a SpringApplication is starting up and the Environment is first available.** This is exactly what we needed i.e. -
 
 1. When this event gets triggered we can be sure that spring has already read all the properties from spring config file (application.prooperties or whatever name we decided to have) as this being part of spring-boot lifecycle
 
@@ -38,9 +38,9 @@ Solution : Though spring does not provide any built in solution for handling abo
 
 To implement this solution we just need two steps -
 
-**1. Implement this ApplicationListener which would listen for ApplicationEnvironmentPreparedEvent, where we can read the properties from spring environment (which spring read from config file) by overriding ##onApplicationEvent method.
+**1. Implement this ApplicationListener which would listen for ApplicationEnvironmentPreparedEvent, where we can read the properties from spring environment (which spring read from config file) by overriding ##onApplicationEvent method.**
 
-2. Register our listener with spring-boot**
+**2. Register our listener with spring-boot**
 
 Here is sample demo for incorporating this solution in any spring-boot application -
 
@@ -81,7 +81,7 @@ public class SystemPropertiesLoader implements ApplicationListener<ApplicationEn
   ``` 
   
   
-  **2.2 If we are planning of creating traditional  web application to deploy on external server, then we will have to register this listener by overriding the "configure" method of Abstract class SpringBootServletInitializer". To know more about this class and why we need this read [this from spring documentation](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/web/servlet/support/SpringBootServletInitializer.html) and [this from baeldung](https://www.baeldung.com/spring-boot-servlet-initializer)**
+  **2.2 If we are planning of creating traditional  web application to deploy on external server, then we will have to register this listener by overriding the "configure" method of Abstract class SpringBootServletInitializer". To know more about this class and how and why we need this read [this from spring documentation](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/web/servlet/support/SpringBootServletInitializer.html) and [this from baeldung](https://www.baeldung.com/spring-boot-servlet-initializer)**
   
   
   ```java
