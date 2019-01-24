@@ -21,5 +21,46 @@ Solution : Though spring does not provide any built in solution for handling our
 1. Before this event gets triggered we can be sure that spring has already read all the properties from spring config file (application.prooperties or whatever name we decided to have) this being part of spring-boot lifecycle
 2. We can be also sure that none of the beans are initlized when control comes to this listener, so we can dio any preprocerssing we need.
 
+So to implement this solution we just need two steps -
+1. Implement this ApplicationListener which would listen for ApplicationEnvironmentPreparedEvent, where we can read the properties from spring environment (which spring read from config file) by overriding ##onApplicationEvent method.
+2. Register our listener with spring-boot
 
+Here is sample demo -
+1. Implement the ApplicationListener
+```java
+
+public class SystemPropertiesLoader implements ApplicationListener<ApplicationEnvironemntPreparedEvent>
+{
+
+  public void onApplicationEvent(ApplicationEnvironemntPreparedEvent event){
+    // Get the spring Environemnt from event
+    ConfigurableEnvironment cenv = event.getEnvironment(); // provides hook for all spring environemtn configurations
+    
+    // read the desired property from configurable environment and then set that as System property
+    String desiredPropertyValue = cenv.getProperty("DesiredPropertyName");
+    
+    System.setProperty("systemPropertyName", dersiredPropertyValue);
+  
+  }
+```
+2. Register the listener
+  2.1 If we are using spring-boot's embadded server
+  ```java
+  public staic void main (String[] args){
+    SpringApplication springApp = new SpringApplication(ProjectConfigurationClass configClass);
+    
+    //This is how we will register the listener with spring boot lifecycle
+    springApp.addListener(new SystemPropertiesLoader());
+    
+    springApp.run();
+  }
+  ``` 
+  2.2 If we are planning of creating a war file and planning to deploy on external server, then we will have to register this listener via overriding the "configure" method of Abstract class SpringBootServletInitializer". To know more about this class and why we need this read this https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/web/servlet/support/SpringBootServletInitializer.html and this https://www.baeldung.com/spring-boot-servlet-initializer
+  
+  ```java
+  protected SpringApplicationBuilder configure(SpringApplicationBuilder builder){
+    return builder.listeners(new SystemPropertiesLoader());
+  }
+  
+  ```
 
