@@ -21,7 +21,7 @@ We wanted a solution to have spring boot lifecycle handle it rather then writing
 We needed some hook which 
 
 
-1. Could read the application.prorperties file (more precisely properties declared in it) before any bean gets initialized
+1. Could read the application.properties file (more precisely properties declared in it) before any bean gets initialized
 
 2. Decrypt some encrypted properties specially passwords using our custom decryption mechanism
 
