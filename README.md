@@ -32,7 +32,7 @@ We looked for solution on the web and couldn't find any readymade solutions for 
 
 **Solution :** Though spring does not provide any built in solution for handling above mention problem but we found that it does provide eventListener classes which could provide us application hooks at different level of spring-boot application life cycle. For our problem statment,  we decided to implement ##org.springframework.context.ApplicationListener which could listen for **ApplicationEnvironmentPreparedEvent**. From [spring-boot documentation](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/context/event/ApplicationEnvironmentPreparedEvent.html)- **Event published when a SpringApplication is starting up and the Environment is first available.** This is exactly what we needed i.e. -
 
-1. When this event gets triggered we can be sure that spring has already read all the properties from spring config file (application.prooperties or whatever name we decided to have) as this being part of spring-boot lifecycle
+1. When this event gets triggered we can be sure that spring has already read all the properties from spring config file (application.properties or whatever name we decided to have) as this being part of spring-boot lifecycle
 
 2. We can be also be sure that none of the beans are initlized at the point when control comes to this listener, so we can do any pre-processing we need.
 
